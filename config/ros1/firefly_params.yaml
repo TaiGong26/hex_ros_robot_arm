@@ -1,6 +1,6 @@
 # rate
-ctrl_rate: 500.0
-rate_state: 100.0
+ctrl_rate: 1000.0
+rate_state: 500.0
 
 # robot connection
 robot_host: "192.168.1.100"

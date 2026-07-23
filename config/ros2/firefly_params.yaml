@@ -1,10 +1,10 @@
 hex_ros_robot_firefly_y6:
   ros__parameters:
     # main loop rate [hz] — equals robot ctrl_rate
-    ctrl_rate: 500.0
+    ctrl_rate: 1000.0
 
     # robot state publish rate [hz]
-    rate_state: 100.0
+    rate_state: 500.0
 
     # robot connection
     robot_host: "192.168.1.100"
