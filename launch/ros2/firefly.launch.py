@@ -35,8 +35,8 @@ def generate_launch_description():
     robot_grip_type_arg = DeclareLaunchArgument(
         name='robot_grip_type',
         default_value='empty',
-        choices=['gp80', 'empty'],
-        description='Grip type: gp80 (1-DoF) or empty (0-DoF)')
+        choices=['gp80','gr100', 'empty'],
+        description='Grip type: gp80/gr100 (1-DoF) or empty (0-DoF)')
 
     # robot node
     robot_param_path = FindPackageShare(package_name).find(
