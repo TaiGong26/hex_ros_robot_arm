@@ -70,6 +70,7 @@ class DataInterface(ArmInterfaceBase):
         self.__node.declare_parameter('robot_port', 8439)
         self.__node.declare_parameter('robot_frame_id', "base_link")
         self.__node.declare_parameter('robot_grip_type', "gp80")
+        self.__node.declare_parameter('robot_enable_kcp', True)
         self.__node.declare_parameter('state_buffer_size', 200)
         self.__node.declare_parameter('sens_ts', False)
         self.__node.declare_parameter('use_ros_time', False)
@@ -78,6 +79,7 @@ class DataInterface(ArmInterfaceBase):
             "port": self.__node.get_parameter('robot_port').value,
             "frame_id": self.__node.get_parameter('robot_frame_id').value,
             "grip_type": self.__node.get_parameter('robot_grip_type').value,
+            "enable_kcp": self.__node.get_parameter('robot_enable_kcp').value,
             "state_buffer_size": self.__node.get_parameter('state_buffer_size').value,
             "sens_ts": self.__node.get_parameter('sens_ts').value,
         }

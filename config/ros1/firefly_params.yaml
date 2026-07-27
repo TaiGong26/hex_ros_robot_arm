@@ -12,6 +12,9 @@ robot_frame_id: "base_link"
 # grip type: "gp80" or "empty"
 robot_grip_type: "empty"
 
+# enable KCP protocol (UDP low-latency data channel)
+robot_enable_kcp: true
+
 # driver state buffer size
 state_buffer_size: 200
 

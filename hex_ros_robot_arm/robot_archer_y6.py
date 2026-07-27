@@ -47,6 +47,7 @@ class RobotArcherY6:
         self.__data_interface.logi(f"robot_port: {robot_param['port']}")
         self.__data_interface.logi(f"robot_frame_id: {robot_param['frame_id']}")
         self.__data_interface.logi(f"robot_grip_type: {robot_param['grip_type']}")
+        self.__data_interface.logi(f"robot_enable_kcp: {robot_param['enable_kcp']}")
         self.__data_interface.logi(f"state_buffer_size: {robot_param['state_buffer_size']}")
         self.__data_interface.logi(f"sens_ts: {robot_param['sens_ts']}")
 
@@ -58,6 +59,7 @@ class RobotArcherY6:
             state_buffer_size=robot_param["state_buffer_size"],
             sens_ts=robot_param["sens_ts"],
             grip_type=robot_param["grip_type"],
+            enable_kcp=robot_param["enable_kcp"],
         ))
         self.__robot.start()
 

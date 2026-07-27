@@ -61,6 +61,7 @@ class DataInterface(ArmInterfaceBase):
             "port": rospy.get_param('~robot_port', 8439),
             "frame_id": rospy.get_param('~robot_frame_id', "base_link"),
             "grip_type": rospy.get_param('~robot_grip_type', "gp80"),
+            "enable_kcp": rospy.get_param('~robot_enable_kcp', True),
             "state_buffer_size": rospy.get_param('~state_buffer_size', 200),
             "sens_ts": rospy.get_param('~sens_ts', False),
         }

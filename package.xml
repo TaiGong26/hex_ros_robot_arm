@@ -8,7 +8,7 @@
     Merges the three robot nodes into one with robot_type dispatch.
     Shares the full manipulator utility interface from archer/firefly.
   </description>
-  <maintainer email="taigong26@gmail.com">hexfellow</maintainer>
+  <maintainer email="thetaigon@qq.com">hexfellow</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
