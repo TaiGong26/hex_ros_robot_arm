@@ -48,7 +48,7 @@ class DataInterface(HelloInterfaceBase):
             "port": rospy.get_param('~robot_port', 8439),
             "frame_id": rospy.get_param('~robot_frame_id', "base_link"),
             "state_buffer_size": rospy.get_param('~state_buffer_size', 200),
-            "sens_ts": rospy.get_param('~sens_ts', False),
+            "sens_ts": rospy.get_param('~sens_ts', True),
         }
 
         ### time source — PTP (ns_now) or ROS clock

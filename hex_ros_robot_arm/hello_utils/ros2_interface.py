@@ -58,7 +58,7 @@ class DataInterface(HelloInterfaceBase):
         self.__node.declare_parameter('robot_port', 8439)
         self.__node.declare_parameter('robot_frame_id', "base_link")
         self.__node.declare_parameter('state_buffer_size', 200)
-        self.__node.declare_parameter('sens_ts', False)
+        self.__node.declare_parameter('sens_ts', True)
         self.__node.declare_parameter('use_ros_time', False)
         self._robot_param = {
             "host": self.__node.get_parameter('robot_host').value,

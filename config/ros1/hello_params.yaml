@@ -13,7 +13,7 @@ robot_frame_id: "base_link"
 state_buffer_size: 200
 
 # sensor timestamp enable
-sens_ts: false
+sens_ts: true
 
 # time source: false → PTP (ns_now), true → ROS clock
 use_ros_time: false
