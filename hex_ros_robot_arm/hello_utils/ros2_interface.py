@@ -16,7 +16,6 @@ import rclpy.node
 
 from builtin_interfaces.msg import Time
 from sensor_msgs.msg import JointState
-from rosgraph_msgs.msg import Clock
 from std_msgs.msg import ColorRGBA
 from hex_ros_msgs.msg import (
     HexRosRoboManipStateStamped,
@@ -81,12 +80,6 @@ class DataInterface(HelloInterfaceBase):
         self.__joint_state_pub = self.__node.create_publisher(
             JointState,
             'joint_states',
-            10,
-        )
-        ### publisher — /clock (for sim_time compatibility)
-        self.__clock_pub = self.__node.create_publisher(
-            Clock,
-            '/clock',
             10,
         )
         ### publisher — joy_state (Hello grip joy)
@@ -210,14 +203,6 @@ class DataInterface(HelloInterfaceBase):
         msg.effort = np.asarray(
             out.manip_state.arm_state.jnt.effort, dtype=np.float64).tolist()
         self.__joint_state_pub.publish(msg)
-
-    def pub_clock(self, stamp_ns: int):
-        msg = Clock()
-        msg.clock = Time(
-            sec=int(stamp_ns // 1_000_000_000),
-            nanosec=int(stamp_ns % 1_000_000_000),
-        )
-        self.__clock_pub.publish(msg)
 
     def pub_joy_state(self, out: HexDcTeleopHandleStateStamped):
         msg = HexRosTeleopHandleStateStamped()

@@ -118,9 +118,6 @@ class RobotHelloY6:
             if color_cmd is not None:
                 self.__robot.set_rgb_cmd(color_cmd)
 
-            # 2. publish /clock
-            self.__data_interface.pub_clock(self.__data_interface.now_ns())
-
             # 3. publish robot state at the requested rate
             state_count += 1
             if state_count >= self.__state_decim:

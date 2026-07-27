@@ -92,10 +92,6 @@ class ArmInterfaceBase(ABC):
     def pub_joint_state(self, out: HexDcRoboManipStateStamped):
         raise NotImplementedError("ArmInterfaceBase.pub_joint_state")
 
-    @abstractmethod
-    def pub_clock(self, stamp_ns: int):
-        raise NotImplementedError("ArmInterfaceBase.pub_clock")
-
     ####################
     ### subscribers
     ####################

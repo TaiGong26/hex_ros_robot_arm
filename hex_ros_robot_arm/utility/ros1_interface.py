@@ -13,7 +13,6 @@ import rospy
 from hex_util_runtime import ns_now
 
 from sensor_msgs.msg import JointState
-from rosgraph_msgs.msg import Clock
 from std_msgs.msg import ColorRGBA
 from geometry_msgs.msg import Pose
 from hex_ros_msgs.msg import (
@@ -79,12 +78,6 @@ class DataInterface(ArmInterfaceBase):
         self.__joint_state_pub = rospy.Publisher(
             'joint_states',
             JointState,
-            queue_size=10,
-        )
-        ### publisher — /clock
-        self.__clock_pub = rospy.Publisher(
-            '/clock',
-            Clock,
             queue_size=10,
         )
 
@@ -197,14 +190,6 @@ class DataInterface(ArmInterfaceBase):
                        dtype=np.float64),
         ]).tolist()
         self.__joint_state_pub.publish(msg)
-
-    def pub_clock(self, stamp_ns: int):
-        msg = Clock()
-        msg.clock = rospy.Time(
-            int(stamp_ns // 1_000_000_000),
-            int(stamp_ns % 1_000_000_000),
-        )
-        self.__clock_pub.publish(msg)
 
     def __manip_ctrl_callback(self, msg: HexRosRoboManipCtrlStamped):
         self._manip_ctrl_deque.append(self.__manip_ctrl_msg_to_dc(msg))

@@ -100,10 +100,6 @@ class HelloInterfaceBase(ABC):
         raise NotImplementedError("HelloInterfaceBase.pub_joint_state")
 
     @abstractmethod
-    def pub_clock(self, stamp_ns: int):
-        raise NotImplementedError("HelloInterfaceBase.pub_clock")
-
-    @abstractmethod
     def pub_joy_state(self, out: HexDcTeleopHandleStateStamped):
         raise NotImplementedError("HelloInterfaceBase.pub_joy_state")
 
