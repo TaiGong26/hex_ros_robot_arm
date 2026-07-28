@@ -63,6 +63,8 @@ class RobotFireflyY6:
         ))
         self.__robot.start()
 
+        self.__data_interface.set_joint_names(self.__robot.get_dofs())
+
         ### derived
         self.__state_decim = max(
             1,

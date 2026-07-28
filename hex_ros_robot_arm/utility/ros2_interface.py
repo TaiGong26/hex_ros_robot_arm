@@ -42,7 +42,6 @@ from hex_util_msg.dataclass.dataclass_robo import (
 )
 
 from .interface_base import ArmInterfaceBase
-from .interface_base import JOINT_STATE_NAME
 
 
 class DataInterface(ArmInterfaceBase):
@@ -182,7 +181,7 @@ class DataInterface(ArmInterfaceBase):
         )
         msg.manip_state.arm_state.jnt.header.stamp = hardware_stamp
         msg.manip_state.arm_state.jnt.header.frame_id = out.header.frame_id
-        msg.manip_state.arm_state.jnt.name = JOINT_STATE_NAME
+        msg.manip_state.arm_state.jnt.name = self._arm_joint_names
         msg.manip_state.arm_state.jnt.position = \
             np.asarray(arm.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.arm_state.jnt.velocity = \
@@ -200,7 +199,7 @@ class DataInterface(ArmInterfaceBase):
         grip = out.manip_state.grip_state
         msg.manip_state.grip_state.jnt.header.stamp = hardware_stamp
         msg.manip_state.grip_state.jnt.header.frame_id = out.header.frame_id
-        msg.manip_state.grip_state.jnt.name = JOINT_STATE_NAME
+        msg.manip_state.grip_state.jnt.name = self._grip_joint_names
         msg.manip_state.grip_state.jnt.position = \
             np.asarray(grip.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.grip_state.jnt.velocity = \
@@ -218,7 +217,7 @@ class DataInterface(ArmInterfaceBase):
             nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
-        msg.name = JOINT_STATE_NAME
+        msg.name = self._arm_joint_names + self._grip_joint_names
         msg.position = np.concatenate([
             np.asarray(out.manip_state.arm_state.jnt.position,
                        dtype=np.float64),

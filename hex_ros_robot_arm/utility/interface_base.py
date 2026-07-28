@@ -16,13 +16,12 @@ from hex_util_msg.dataclass.dataclass_robo import (
     HexDcRoboManipStateStamped,
 )
 
-JOINT_STATE_NAME = [f"joint_{i}" for i in range(1, 7)] + ["grip_joint_1"]
-
-
 class ArmInterfaceBase(ABC):
 
     def __init__(self, name: str = "unknown"):
         self._name = name
+        self._arm_joint_names = []
+        self._grip_joint_names = []
 
         ### ros parameters
         self._rate_param = {}
@@ -85,6 +84,11 @@ class ArmInterfaceBase(ABC):
 
     def get_robot_param(self) -> dict:
         return self._robot_param
+
+    def set_joint_names(self, dofs: dict[str, int]):
+        
+        self._arm_joint_names = [f"arm_joint_{i}" for i in range(1, dofs.get("arm", 6) + 1)]
+        self._grip_joint_names = [f"grip_joint_{i}" for i in range(1, dofs.get("grip", 0) + 1)]
 
     ####################
     ### publishers
