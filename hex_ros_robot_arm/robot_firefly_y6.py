@@ -47,6 +47,7 @@ class RobotFireflyY6:
         self.__data_interface.logi(f"robot_port: {robot_param['port']}")
         self.__data_interface.logi(f"robot_frame_id: {robot_param['frame_id']}")
         self.__data_interface.logi(f"robot_grip_type: {robot_param['grip_type']}")
+        self.__data_interface.logi(f"robot_enable_kcp: {robot_param['enable_kcp']}")
         self.__data_interface.logi(f"state_buffer_size: {robot_param['state_buffer_size']}")
         self.__data_interface.logi(f"sens_ts: {robot_param['sens_ts']}")
 
@@ -58,8 +59,11 @@ class RobotFireflyY6:
             state_buffer_size=robot_param["state_buffer_size"],
             sens_ts=robot_param["sens_ts"],
             grip_type=robot_param["grip_type"],
+            enable_kcp=robot_param["enable_kcp"],
         ))
         self.__robot.start()
+
+        self.__data_interface.set_joint_names(self.__robot.get_dofs())
 
         ### derived
         self.__state_decim = max(
@@ -194,9 +198,6 @@ class RobotFireflyY6:
             ctrl = self.__data_interface.get_manip_ctrl(latest=True)
             if ctrl is not None:
                 self.__apply_manip_ctrl(ctrl)
-
-            # 2. publish /clock
-            self.__data_interface.pub_clock(self.__data_interface.now_ns())
 
             # 3. publish robot state at the requested rate
             state_count += 1

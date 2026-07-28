@@ -16,7 +16,6 @@ import rclpy.node
 
 from builtin_interfaces.msg import Time
 from sensor_msgs.msg import JointState
-from rosgraph_msgs.msg import Clock
 from geometry_msgs.msg import Pose
 from hex_ros_msgs.msg import (
     HexRosJnt,
@@ -43,7 +42,6 @@ from hex_util_msg.dataclass.dataclass_robo import (
 )
 
 from .interface_base import ArmInterfaceBase
-from .interface_base import JOINT_STATE_NAME
 
 
 class DataInterface(ArmInterfaceBase):
@@ -59,8 +57,8 @@ class DataInterface(ArmInterfaceBase):
         super().__init__(name)
 
         ### rate parameters
-        self.__node.declare_parameter('ctrl_rate', 500.0)
-        self.__node.declare_parameter('rate_state', 100.0)
+        self.__node.declare_parameter('ctrl_rate', 1000.0)
+        self.__node.declare_parameter('rate_state', 500.0)
         self._rate_param["ros"] = self.__node.get_parameter('ctrl_rate').value
         self._rate_param["state"] = self.__node.get_parameter('rate_state').value
         self.__rate = self.__node.create_rate(self._rate_param["ros"])
@@ -70,20 +68,18 @@ class DataInterface(ArmInterfaceBase):
         self.__node.declare_parameter('robot_port', 8439)
         self.__node.declare_parameter('robot_frame_id', "base_link")
         self.__node.declare_parameter('robot_grip_type', "gp80")
+        self.__node.declare_parameter('robot_enable_kcp', True)
         self.__node.declare_parameter('state_buffer_size', 200)
-        self.__node.declare_parameter('sens_ts', False)
-        self.__node.declare_parameter('use_ros_time', False)
+        self.__node.declare_parameter('sens_ts', True)
         self._robot_param = {
             "host": self.__node.get_parameter('robot_host').value,
             "port": self.__node.get_parameter('robot_port').value,
             "frame_id": self.__node.get_parameter('robot_frame_id').value,
             "grip_type": self.__node.get_parameter('robot_grip_type').value,
+            "enable_kcp": self.__node.get_parameter('robot_enable_kcp').value,
             "state_buffer_size": self.__node.get_parameter('state_buffer_size').value,
             "sens_ts": self.__node.get_parameter('sens_ts').value,
         }
-
-        ### time source — PTP (ns_now) or ROS clock
-        self._use_ros_time = self.__node.get_parameter('use_ros_time').value
 
         ### publisher — manip_state
         self.__manip_state_pub = self.__node.create_publisher(
@@ -95,12 +91,6 @@ class DataInterface(ArmInterfaceBase):
         self.__joint_state_pub = self.__node.create_publisher(
             JointState,
             'joint_states',
-            10,
-        )
-        ### publisher — /clock (for sim_time compatibility)
-        self.__clock_pub = self.__node.create_publisher(
-            Clock,
-            '/clock',
             10,
         )
 
@@ -164,22 +154,34 @@ class DataInterface(ArmInterfaceBase):
     ### time source
     ####################
     def now_ns(self) -> int:
-        if self._use_ros_time:
-            return self.__node.get_clock().now().nanoseconds
         return ns_now()
+
+    def now_stamp(self) -> HexDcBaseTime:
+        now = self.__node.get_clock().now()
+        secs, nsecs = now.seconds_nanoseconds()
+        return HexDcBaseTime(secs=secs, nsecs=nsecs)
 
     ####################
     ### publishers
     ####################
     def pub_manip_state(self, out: HexDcRoboManipStateStamped):
         msg = HexRosRoboManipStateStamped()
+        # ros time stamp
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
 
         arm = out.manip_state.arm_state
+        hardware_stamp = Time(
+            sec=int(out.header.stamp.secs),
+            nanosec=int(out.header.stamp.nsecs),
+        )
+        msg.manip_state.arm_state.jnt.header.stamp = hardware_stamp
+        msg.manip_state.arm_state.jnt.header.frame_id = out.header.frame_id
+        msg.manip_state.arm_state.jnt.name = self._arm_joint_names
         msg.manip_state.arm_state.jnt.position = \
             np.asarray(arm.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.arm_state.jnt.velocity = \
@@ -195,6 +197,9 @@ class DataInterface(ArmInterfaceBase):
         msg.manip_state.arm_state.pose.orientation.w = arm.pose.orientation.w
 
         grip = out.manip_state.grip_state
+        msg.manip_state.grip_state.jnt.header.stamp = hardware_stamp
+        msg.manip_state.grip_state.jnt.header.frame_id = out.header.frame_id
+        msg.manip_state.grip_state.jnt.name = self._grip_joint_names
         msg.manip_state.grip_state.jnt.position = \
             np.asarray(grip.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.grip_state.jnt.velocity = \
@@ -206,12 +211,13 @@ class DataInterface(ArmInterfaceBase):
 
     def pub_joint_state(self, out: HexDcRoboManipStateStamped):
         msg = JointState()
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
-        msg.name = JOINT_STATE_NAME
+        msg.name = self._arm_joint_names + self._grip_joint_names
         msg.position = np.concatenate([
             np.asarray(out.manip_state.arm_state.jnt.position,
                        dtype=np.float64),
@@ -231,14 +237,6 @@ class DataInterface(ArmInterfaceBase):
                        dtype=np.float64),
         ]).tolist()
         self.__joint_state_pub.publish(msg)
-
-    def pub_clock(self, stamp_ns: int):
-        msg = Clock()
-        msg.clock = Time(
-            sec=int(stamp_ns // 1_000_000_000),
-            nanosec=int(stamp_ns % 1_000_000_000),
-        )
-        self.__clock_pub.publish(msg)
 
     def __manip_ctrl_callback(self, msg: HexRosRoboManipCtrlStamped):
         self._manip_ctrl_deque.append(self.__manip_ctrl_msg_to_dc(msg))

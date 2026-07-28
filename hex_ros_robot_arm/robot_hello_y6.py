@@ -60,6 +60,8 @@ class RobotHelloY6:
         ))
         self.__robot.start()
 
+        self.__data_interface.set_joint_names(self.__robot.get_dofs())
+
         ### derived
         self.__state_decim = max(
             1,
@@ -117,9 +119,6 @@ class RobotHelloY6:
             color_cmd = self.__data_interface.get_color_cmd(latest=True)
             if color_cmd is not None:
                 self.__robot.set_rgb_cmd(color_cmd)
-
-            # 2. publish /clock
-            self.__data_interface.pub_clock(self.__data_interface.now_ns())
 
             # 3. publish robot state at the requested rate
             state_count += 1

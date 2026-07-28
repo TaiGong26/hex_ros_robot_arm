@@ -1,6 +1,6 @@
 # rate
-ctrl_rate: 500.0
-rate_state: 100.0
+ctrl_rate: 1000.0
+rate_state: 500.0
 
 # robot connection
 robot_host: "192.168.1.100"
@@ -12,11 +12,11 @@ robot_frame_id: "base_link"
 # grip type: "gp80" or "empty"
 robot_grip_type: "empty"
 
+# enable KCP protocol (UDP low-latency data channel)
+robot_enable_kcp: true
+
 # driver state buffer size
 state_buffer_size: 200
 
 # sensor timestamp enable
-sens_ts: false
-
-# time source: false → PTP (ns_now), true → ROS clock
-use_ros_time: false
+sens_ts: true

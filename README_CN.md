@@ -14,12 +14,10 @@
 
 ## 1. 包的简介
 
-这是 **Archer Y6**、**Firefly Y6**、**Hello Y6** 三种机械臂的 **统一 ROS 驱动包**。
-
-本包在单个 ROS 包内包含三个独立的真机节点，共享同一套 `utility/` 接口层。三个节点相互独立，不通过 `robot_type` 分发，而是各自通过独立的 `entry_point` 启动：
+这是 **HEXFELLOW** 机械臂的 **ROS 驱动包**
 
 - **Archer Y6** — 6 自由度机械臂 + 夹爪，支持 MIT/位置/末端位姿控制
-- **Firefly Y6** — 6 自由度机械臂 + 夹爪，与 Archer 结构对称（`robot_type=27`）
+- **Firefly Y6** — 6 自由度机械臂 + 夹爪，与 Archer 结构一致
 - **Hello Y6** — 6 自由度只读机械臂（state-only），支持摇杆手柄和 RGB LED
 
 每个节点通过 WebSocket 连接真实控制器，订阅控制指令，发布机械臂实时状态。同时支持 **ROS 1** 和 **ROS 2**。
@@ -63,16 +61,6 @@ hex_ros_robot_arm/
 └── README.md                      # 英文文档
 ```
 
-### 三层接口说明
-
-本包按产品需求将接口层分为三个子模块：
-
-| 模块 | 适用节点 | 发布 | 订阅 | 说明 |
-|------|---------|------|------|------|
-| `utility/` | archer, firefly | manip_state, joint_states (7-DoF), /clock | manip_ctrl | 标准机械臂接口（臂 + 夹爪控制） |
-| `hello_utils/` | hello | manip_state, joint_states (6-DoF), joy_state, /clock | color_cmd | 只读模式（无夹爪控制，支持摇杆 + RGB LED） |
-| `test_utils/` | test_ctrl | — | — | 调试用，手动构造控制指令 |
-
 ---
 
 ## 3. 话题接口
@@ -84,8 +72,6 @@ hex_ros_robot_arm/
 | 订阅 | `manip_ctrl` | `hex_ros_msgs/(msg/)HexRosRoboManipCtrlStamped` | 机械臂 + 夹爪控制指令 |
 | 发布 | `manip_state` | `hex_ros_msgs/(msg/)HexRosRoboManipStateStamped` | 机械臂 + 夹爪状态反馈 |
 | 发布 | `joint_states` | `sensor_msgs/(msg/)JointState` | 7 个关节（6 臂 + 1 夹爪） |
-| 发布 | `/clock` | `rosgraph_msgs/(msg/)Clock` | 时钟消息，用于 sim_time 兼容模式 |
-
 ### Hello Y6（只读机械臂 + 摇杆手柄 + RGB LED）
 
 | 方向 | 话题 | 类型 | 说明 |
@@ -93,7 +79,6 @@ hex_ros_robot_arm/
 | 发布 | `manip_state` | `hex_ros_msgs/(msg/)HexRosRoboManipStateStamped` | 机械臂状态反馈（夹爪为空） |
 | 发布 | `joint_states` | `sensor_msgs/(msg/)JointState` | 6 个臂关节（无夹爪） |
 | 发布 | `joy_state` | `hex_ros_msgs/(msg/)HexRosTeleopHandleStateStamped` | 摇杆手柄状态（axis_x/y、trigger、按钮 W/X/Y/Z） |
-| 发布 | `/clock` | `rosgraph_msgs/(msg/)Clock` | 时钟消息，用于 sim_time 兼容模式 |
 | 订阅 | `color_cmd` | `std_msgs/(msg/)ColorRGBA` | RGB LED 颜色指令（float 0-1 → int 0-255） |
 
 > [消息类型描述](https://github.com/hexfellow/hex_ros_msgs#public-apis)
@@ -104,17 +89,15 @@ hex_ros_robot_arm/
 
 > 确保在安全区域内运行，并随时准备急停
 
-
-
 ---
 
 ## 4. 控制模式
 
 ### Archer Y6 / Firefly Y6
 
-**臂控制模式：** MIT 、JNT（位置）、EE（末端位姿）、NONE
+**臂控制模式：** MIT 、JNT（位置）、EE（末端位姿）
 
-**夹爪控制模式：** MIT 、JNT（位置）、TAU（力矩）、NONE
+**夹爪控制模式：** MIT 、JNT（位置）、TAU（力矩）
 
 ### Hello Y6
 
@@ -133,10 +116,9 @@ hex_ros_robot_arm/
 | `robot_host` | 192.168.1.100 | 机器人控制器 IP 地址 |
 | `robot_port` | 8439 | WebSocket 端口 |
 | `robot_frame_id` | `base_link` | 状态消息中的坐标系 |
-| `robot_grip_type` | `gp80` | 夹爪类型：`gp80`（1 自由度）或 `empty`（无夹爪） |
+| `robot_grip_type` | `empty` | 夹爪类型：`gp80`、`gr100`或 `empty`（无夹爪） |
 | `state_buffer_size` | 200 | 驱动状态缓冲区大小 |
-| `sens_ts` | `false` | 是否使用传感器硬件时间戳 |
-| `use_ros_time` | `false` | 时间源：`false` → PTP，`true` → ROS 时钟 |
+| `sens_ts` | `true` | 是否使用传感器硬件时间戳 |
 
 ### Hello Y6
 
@@ -148,10 +130,12 @@ hex_ros_robot_arm/
 | `robot_port` | 8439 | WebSocket 端口 |
 | `robot_frame_id` | `base_link` | 状态消息中的坐标系 |
 | `state_buffer_size` | 200 | 驱动状态缓冲区大小 |
-| `sens_ts` | `false` | 是否使用传感器硬件时间戳 |
-| `use_ros_time` | `false` | 时间源：`false` → PTP，`true` → ROS 时钟 |
+| `sens_ts` | `true` | 是否使用传感器硬件时间戳 |
 
-> Hello Y6 无 `robot_grip_type` 参数（不涉及电机夹爪控制），且默认 `ctrl_rate` / `rate_state` 较低。
+> Hello Y6 无 `robot_grip_type` 参数（不涉及电机夹爪控制）。
+
+
+> 默认提供ros时间；如果您需要硬件时间戳，可以通过`chs_state.jnt.header.stamp`获取
 
 ---
 
@@ -233,3 +217,4 @@ ros2 launch hex_ros_robot_arm archer.launch.py \
 ```
 
 > 将 `robot_host` 和 `robot_port` 替换为实际机器人控制器的 IP 和端口。
+> 我们提供了test_ctrl节点作为示例，您可以参考该节点实现控制。

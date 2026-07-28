@@ -10,18 +10,18 @@ from collections import deque
 from typing import Any, Optional
 from abc import ABC, abstractmethod
 
+from hex_util_msg.dataclass.dataclass_base import HexDcBaseTime
 from hex_util_msg.dataclass.dataclass_robo import (
     HexDcRoboManipCtrlStamped,
     HexDcRoboManipStateStamped,
 )
 
-JOINT_STATE_NAME = [f"joint_{i}" for i in range(1, 7)] + ["grip_joint_1"]
-
-
 class ArmInterfaceBase(ABC):
 
     def __init__(self, name: str = "unknown"):
         self._name = name
+        self._arm_joint_names = []
+        self._grip_joint_names = []
 
         ### ros parameters
         self._rate_param = {}
@@ -48,6 +48,10 @@ class ArmInterfaceBase(ABC):
     @abstractmethod
     def now_ns(self) -> int:
         raise NotImplementedError("ArmInterfaceBase.now_ns")
+
+    @abstractmethod
+    def now_stamp(self) -> HexDcBaseTime:
+        raise NotImplementedError("ArmInterfaceBase.now_stamp")
 
     ####################
     ### logging
@@ -81,6 +85,11 @@ class ArmInterfaceBase(ABC):
     def get_robot_param(self) -> dict:
         return self._robot_param
 
+    def set_joint_names(self, dofs: dict[str, int]):
+        
+        self._arm_joint_names = [f"arm_joint_{i}" for i in range(1, dofs.get("arm", 6) + 1)]
+        self._grip_joint_names = [f"grip_joint_{i}" for i in range(1, dofs.get("grip", 0) + 1)]
+
     ####################
     ### publishers
     ####################
@@ -91,10 +100,6 @@ class ArmInterfaceBase(ABC):
     @abstractmethod
     def pub_joint_state(self, out: HexDcRoboManipStateStamped):
         raise NotImplementedError("ArmInterfaceBase.pub_joint_state")
-
-    @abstractmethod
-    def pub_clock(self, stamp_ns: int):
-        raise NotImplementedError("ArmInterfaceBase.pub_clock")
 
     ####################
     ### subscribers

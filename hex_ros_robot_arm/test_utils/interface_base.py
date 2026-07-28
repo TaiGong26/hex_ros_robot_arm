@@ -19,13 +19,20 @@ from hex_util_msg.dataclass.dataclass_robo import (
 class TestInterfaceBase(ABC):
 
     def __init__(self, name: str = "unknown"):
-        self._name = name
-
         ### ros parameters
         self._rate_param = {}
 
         ### rx msg queues
         self._manip_state_deque = deque(maxlen=100)
+
+        ### name
+        self._name = name
+
+    def __del__(self):
+        try:
+            self.shutdown()
+        except Exception:
+            pass
 
     ####################
     ### ros infrastructure
@@ -41,10 +48,6 @@ class TestInterfaceBase(ABC):
     @abstractmethod
     def sleep(self):
         raise NotImplementedError("TestInterfaceBase.sleep")
-
-    @abstractmethod
-    def now_ns(self) -> int:
-        raise NotImplementedError("TestInterfaceBase.now_ns")
 
     ####################
     ### logging

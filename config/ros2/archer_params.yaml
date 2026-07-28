@@ -16,11 +16,11 @@ hex_ros_robot_archer_y6:
     # grip type: "gp80" (1-DoF) or "empty" (0-DoF)
     robot_grip_type: "empty"
 
+    # enable KCP protocol (UDP low-latency data channel)
+    robot_enable_kcp: true
+
     # driver state buffer size
     state_buffer_size: 200
 
     # sensor timestamp enable
-    sens_ts: false
-
-    # time source: false → PTP (ns_now), true → ROS clock
-    use_ros_time: false
+    sens_ts: true

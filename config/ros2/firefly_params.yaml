@@ -1,10 +1,10 @@
 hex_ros_robot_firefly_y6:
   ros__parameters:
     # main loop rate [hz] — equals robot ctrl_rate
-    ctrl_rate: 500.0
+    ctrl_rate: 1000.0
 
     # robot state publish rate [hz]
-    rate_state: 100.0
+    rate_state: 500.0
 
     # robot connection
     robot_host: "192.168.1.100"
@@ -16,11 +16,11 @@ hex_ros_robot_firefly_y6:
     # grip type: "gp80" (1-DoF) or "empty" (0-DoF)
     robot_grip_type: "empty"
 
+    # enable KCP protocol (UDP low-latency data channel)
+    robot_enable_kcp: true
+
     # driver state buffer size
     state_buffer_size: 200
 
     # sensor timestamp enable
-    sens_ts: false
-
-    # time source: false → PTP (ns_now), true → ROS clock
-    use_ros_time: false
+    sens_ts: true
