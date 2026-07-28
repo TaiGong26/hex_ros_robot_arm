@@ -23,7 +23,7 @@
     <!-- test group -->
     <group if="$(arg test)">
         <node name="test_ctrl" pkg="hex_ros_robot_arm" type="test_ctrl.py" output="screen">
-            <param name="use_sim_time" value="true"/>
+            <param name="use_sim_time" value="false"/>
         </node>
     </group>
 </launch>

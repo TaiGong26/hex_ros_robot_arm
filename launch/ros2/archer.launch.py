@@ -66,7 +66,7 @@ def generate_launch_description():
                 output="screen",
                 emulate_tty=True,
                 parameters=[{
-                    'use_sim_time': True,
+                    'use_sim_time': False,
                 }],
                 remappings=[
                     ('manip_ctrl', 'manip_ctrl'),

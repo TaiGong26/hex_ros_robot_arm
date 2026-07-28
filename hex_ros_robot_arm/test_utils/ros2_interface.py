@@ -42,28 +42,28 @@ from hex_util_msg.dataclass.dataclass_robo import (
 )
 
 from .interface_base import TestInterfaceBase
+from rclpy.logging import LoggingSeverity
 
 
 class DataInterface(TestInterfaceBase):
 
     def __init__(self, name: str = "unknown"):
+        super(DataInterface, self).__init__(name=name)
+        
+        ### ros node
         rclpy.init()
         self.__node = rclpy.node.Node(name)
-        self._logger = self.__node.get_logger()
-        self._shutting_down = False
-        self.__spin_thread = threading.Thread(target=self.__spin)
-        self.__spin_thread.start()
-
-        super().__init__(name)
-
-        ### parameters
+        self.__logger = self.__node.get_logger()
+        # self.__logger.set_level(LoggingSeverity.DEBUG)
         self.__node.declare_parameter('rate_ros', 1000.0)
         self._rate_param["ros"] = self.__node.get_parameter('rate_ros').value
         self.__rate = self.__node.create_rate(self._rate_param["ros"])
 
+        ### parameters
         self.__node.declare_parameter('rate_ctrl', 500.0)
         self._rate_param.update({
-            "ctrl": self.__node.get_parameter('rate_ctrl').value,
+            "ctrl":
+            self.__node.get_parameter('rate_ctrl').value,
         })
 
         ### publisher
@@ -82,19 +82,27 @@ class DataInterface(TestInterfaceBase):
         )
         self.__manip_state_sub
 
-    def sleep(self):
-        self.__rate.sleep()
+        ### spin thread
+        self.__shutting_down = False
+        self.__spin_thread = threading.Thread(target=self.__spin)
+        self.__spin_thread.start()
 
-    ####################
-    ### ros infrastructure
-    ####################
-    def ok(self) -> bool:
+        ### finish log
+        print(f"#### DataInterface init: {self._name} ####")
+
+    def __spin(self):
+        try:
+            rclpy.spin(self.__node)
+        except rclpy.executors.ExternalShutdownException:
+            pass
+
+    def ok(self):
         return rclpy.ok()
 
     def shutdown(self):
-        if self._shutting_down:
+        if self.__shutting_down:
             return
-        self._shutting_down = True
+        self.__shutting_down = True
         try:
             self.__node.destroy_node()
         except Exception:
@@ -105,32 +113,26 @@ class DataInterface(TestInterfaceBase):
             pass
         self.__spin_thread.join()
 
-    def __spin(self):
-        try:
-            rclpy.spin(self.__node)
-        except rclpy.executors.ExternalShutdownException:
-            pass
-
-    def now_ns(self) -> int:
-        return self.__node.get_clock().now().nanoseconds
+    def sleep(self):
+        self.__rate.sleep()
 
     ####################
     ### logging
     ####################
     def logd(self, msg, *args, **kwargs):
-        self._logger.debug(msg, *args, **kwargs)
+        self.__logger.debug(msg, *args, **kwargs)
 
     def logi(self, msg, *args, **kwargs):
-        self._logger.info(msg, *args, **kwargs)
+        self.__logger.info(msg, *args, **kwargs)
 
     def logw(self, msg, *args, **kwargs):
-        self._logger.warning(msg, *args, **kwargs)
+        self.__logger.warning(msg, *args, **kwargs)
 
     def loge(self, msg, *args, **kwargs):
-        self._logger.error(msg, *args, **kwargs)
+        self.__logger.error(msg, *args, **kwargs)
 
     def logf(self, msg, *args, **kwargs):
-        self._logger.fatal(msg, *args, **kwargs)
+        self.__logger.fatal(msg, *args, **kwargs)
 
     ####################
     ### publishers
