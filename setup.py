@@ -21,7 +21,7 @@ def get_files(tar: str, src: str):
 
 setup(
     name=package_name,
-    version='0.0.1',
+    version='0.1.1',
     packages=find_packages(),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -37,7 +37,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='hexfellow',
-    maintainer_email='taigong26@gmail.com',
+    maintainer_email='thetaigon@qq.com',
     description='ROS package with separated robot nodes for archer/firefly/hello',
     license='Apache-2.0',
     entry_points={

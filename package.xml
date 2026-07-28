@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>hex_ros_robot_arm</name>
-  <version>0.0.1</version>
+  <version>0.1.1</version>
   <description>
     Unified ROS interface for hex manipulator robots (archer/firefly/hello).
     Merges the three robot nodes into one with robot_type dispatch.
