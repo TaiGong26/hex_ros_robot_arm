@@ -10,6 +10,7 @@ from collections import deque
 from typing import Any, Optional
 from abc import ABC, abstractmethod
 
+from hex_util_msg.dataclass.dataclass_base import HexDcBaseTime
 from hex_util_msg.dataclass.dataclass_robo import (
     HexDcRoboManipCtrlStamped,
     HexDcRoboManipStateStamped,
@@ -48,6 +49,10 @@ class ArmInterfaceBase(ABC):
     @abstractmethod
     def now_ns(self) -> int:
         raise NotImplementedError("ArmInterfaceBase.now_ns")
+
+    @abstractmethod
+    def now_stamp(self) -> HexDcBaseTime:
+        raise NotImplementedError("ArmInterfaceBase.now_stamp")
 
     ####################
     ### logging

@@ -22,6 +22,7 @@ from hex_ros_msgs.msg import (
     HexRosTeleopHandleStateStamped,
 )
 
+from hex_util_msg.dataclass.dataclass_base import HexDcBaseTime
 from hex_util_msg.dataclass.dataclass_robo import (
     HexDcRoboManipStateStamped,
 )
@@ -155,18 +156,32 @@ class DataInterface(HelloInterfaceBase):
             return self.__node.get_clock().now().nanoseconds
         return ns_now()
 
+    def now_stamp(self) -> HexDcBaseTime:
+        now = self.__node.get_clock().now()
+        secs, nsecs = now.seconds_nanoseconds()
+        return HexDcBaseTime(secs=secs, nsecs=nsecs)
+
     ####################
     ### publishers
     ####################
     def pub_manip_state(self, out: HexDcRoboManipStateStamped):
         msg = HexRosRoboManipStateStamped()
+        # ros time stamp
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
 
         arm = out.manip_state.arm_state
+        hardware_stamp = Time(
+            sec=int(out.header.stamp.secs),
+            nanosec=int(out.header.stamp.nsecs),
+        )
+        msg.manip_state.arm_state.jnt.header.stamp = hardware_stamp
+        msg.manip_state.arm_state.jnt.header.frame_id = out.header.frame_id
+        msg.manip_state.arm_state.jnt.name = JOINT_STATE_NAME
         msg.manip_state.arm_state.jnt.position = \
             np.asarray(arm.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.arm_state.jnt.velocity = \
@@ -182,6 +197,9 @@ class DataInterface(HelloInterfaceBase):
         msg.manip_state.arm_state.pose.orientation.w = arm.pose.orientation.w
 
         # Hello Y6 has no gripper — publish empty grip state
+        msg.manip_state.grip_state.jnt.header.stamp = hardware_stamp
+        msg.manip_state.grip_state.jnt.header.frame_id = out.header.frame_id
+        msg.manip_state.grip_state.jnt.name = JOINT_STATE_NAME
         msg.manip_state.grip_state.jnt.position = []
         msg.manip_state.grip_state.jnt.velocity = []
         msg.manip_state.grip_state.jnt.effort = []
@@ -190,9 +208,10 @@ class DataInterface(HelloInterfaceBase):
 
     def pub_joint_state(self, out: HexDcRoboManipStateStamped):
         msg = JointState()
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
         msg.name = JOINT_STATE_NAME
@@ -206,9 +225,10 @@ class DataInterface(HelloInterfaceBase):
 
     def pub_joy_state(self, out: HexDcTeleopHandleStateStamped):
         msg = HexRosTeleopHandleStateStamped()
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
         msg.handle_state.axis_x = out.handle_state.axis_x

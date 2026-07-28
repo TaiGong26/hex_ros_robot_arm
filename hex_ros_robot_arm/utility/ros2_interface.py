@@ -163,18 +163,32 @@ class DataInterface(ArmInterfaceBase):
             return self.__node.get_clock().now().nanoseconds
         return ns_now()
 
+    def now_stamp(self) -> HexDcBaseTime:
+        now = self.__node.get_clock().now()
+        secs, nsecs = now.seconds_nanoseconds()
+        return HexDcBaseTime(secs=secs, nsecs=nsecs)
+
     ####################
     ### publishers
     ####################
     def pub_manip_state(self, out: HexDcRoboManipStateStamped):
         msg = HexRosRoboManipStateStamped()
+        # ros time stamp
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
 
         arm = out.manip_state.arm_state
+        hardware_stamp = Time(
+            sec=int(out.header.stamp.secs),
+            nanosec=int(out.header.stamp.nsecs),
+        )
+        msg.manip_state.arm_state.jnt.header.stamp = hardware_stamp
+        msg.manip_state.arm_state.jnt.header.frame_id = out.header.frame_id
+        msg.manip_state.arm_state.jnt.name = JOINT_STATE_NAME
         msg.manip_state.arm_state.jnt.position = \
             np.asarray(arm.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.arm_state.jnt.velocity = \
@@ -190,6 +204,9 @@ class DataInterface(ArmInterfaceBase):
         msg.manip_state.arm_state.pose.orientation.w = arm.pose.orientation.w
 
         grip = out.manip_state.grip_state
+        msg.manip_state.grip_state.jnt.header.stamp = hardware_stamp
+        msg.manip_state.grip_state.jnt.header.frame_id = out.header.frame_id
+        msg.manip_state.grip_state.jnt.name = JOINT_STATE_NAME
         msg.manip_state.grip_state.jnt.position = \
             np.asarray(grip.jnt.position, dtype=np.float64).tolist()
         msg.manip_state.grip_state.jnt.velocity = \
@@ -201,9 +218,10 @@ class DataInterface(ArmInterfaceBase):
 
     def pub_joint_state(self, out: HexDcRoboManipStateStamped):
         msg = JointState()
+        now_stamp_dc = self.now_stamp()
         msg.header.stamp = Time(
-            sec=int(out.header.stamp.secs),
-            nanosec=int(out.header.stamp.nsecs),
+            sec=int(now_stamp_dc.secs),
+            nanosec=int(now_stamp_dc.nsecs),
         )
         msg.header.frame_id = out.header.frame_id
         msg.name = JOINT_STATE_NAME
