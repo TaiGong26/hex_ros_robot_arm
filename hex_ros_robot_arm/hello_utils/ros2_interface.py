@@ -59,7 +59,6 @@ class DataInterface(HelloInterfaceBase):
         self.__node.declare_parameter('robot_frame_id', "base_link")
         self.__node.declare_parameter('state_buffer_size', 200)
         self.__node.declare_parameter('sens_ts', True)
-        self.__node.declare_parameter('use_ros_time', False)
         self._robot_param = {
             "host": self.__node.get_parameter('robot_host').value,
             "port": self.__node.get_parameter('robot_port').value,
@@ -67,9 +66,6 @@ class DataInterface(HelloInterfaceBase):
             "state_buffer_size": self.__node.get_parameter('state_buffer_size').value,
             "sens_ts": self.__node.get_parameter('sens_ts').value,
         }
-
-        ### time source — PTP (ns_now) or ROS clock
-        self._use_ros_time = self.__node.get_parameter('use_ros_time').value
 
         ### publisher — manip_state
         self.__manip_state_pub = self.__node.create_publisher(
@@ -152,8 +148,6 @@ class DataInterface(HelloInterfaceBase):
     ### time source
     ####################
     def now_ns(self) -> int:
-        if self._use_ros_time:
-            return self.__node.get_clock().now().nanoseconds
         return ns_now()
 
     def now_stamp(self) -> HexDcBaseTime:

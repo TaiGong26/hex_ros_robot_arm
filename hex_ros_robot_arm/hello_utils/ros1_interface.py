@@ -51,9 +51,6 @@ class DataInterface(HelloInterfaceBase):
             "sens_ts": rospy.get_param('~sens_ts', True),
         }
 
-        ### time source — PTP (ns_now) or ROS clock
-        self._use_ros_time = rospy.get_param('~use_ros_time', False)
-
         ### publisher — manip_state
         self.__manip_state_pub = rospy.Publisher(
             'manip_state',
@@ -117,8 +114,6 @@ class DataInterface(HelloInterfaceBase):
     ### time source
     ####################
     def now_ns(self) -> int:
-        if self._use_ros_time:
-            return rospy.Time.now().to_nsec()
         return ns_now()
 
     def now_stamp(self) -> HexDcBaseTime:
