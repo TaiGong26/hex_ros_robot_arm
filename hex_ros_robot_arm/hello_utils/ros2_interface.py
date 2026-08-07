@@ -46,8 +46,8 @@ class DataInterface(HelloInterfaceBase):
         super().__init__(name)
 
         ### rate parameters
-        self.__node.declare_parameter('ctrl_rate', 500.0)
-        self.__node.declare_parameter('rate_state', 100.0)
+        self.__node.declare_parameter('ctrl_rate', 1000.0)
+        self.__node.declare_parameter('rate_state', 500.0)
         self._rate_param["ros"] = self.__node.get_parameter('ctrl_rate').value
         self._rate_param["state"] = self.__node.get_parameter('rate_state').value
         self.__rate = self.__node.create_rate(self._rate_param["ros"])

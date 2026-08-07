@@ -37,8 +37,8 @@ class DataInterface(HelloInterfaceBase):
         super().__init__(name)
 
         ### rate parameters
-        self._rate_param["ros"] = rospy.get_param('~ctrl_rate', 500.0)
-        self._rate_param["state"] = rospy.get_param('~rate_state', 100.0)
+        self._rate_param["ros"] = rospy.get_param('~ctrl_rate', 1000.0)
+        self._rate_param["state"] = rospy.get_param('~rate_state', 500.0)
         self.__rate = rospy.Rate(self._rate_param["ros"])
 
         ### robot parameters (no grip_type — Hello Y6 has no gripper)
