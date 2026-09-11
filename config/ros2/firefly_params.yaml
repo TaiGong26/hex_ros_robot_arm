@@ -4,7 +4,7 @@
     ctrl_rate: 1000.0
 
     # robot state publish rate [hz]
-    rate_state: 500.0
+    rate_state: 1000.0
 
     # robot connection
     robot_host: "192.168.1.100"
@@ -24,3 +24,6 @@
 
     # sensor timestamp enable
     sens_ts: true
+
+    # robot variant: "H1" or "H2_40"
+    variant: "H2_40" 

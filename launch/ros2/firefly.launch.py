@@ -37,24 +37,35 @@ def generate_launch_description():
         default_value='empty',
         choices=['gp80','gr100', 'empty'],
         description='Grip type: gp80/gr100 (1-DoF) or empty (0-DoF)')
+    variant_arg = DeclareLaunchArgument(
+        name='variant',
+        default_value='H1',
+        choices=['H1', 'H2_40'],
+        description='Robot variant: H1 or H2_40')
 
     # robot node
     robot_param_path = FindPackageShare(package_name).find(
         package_name) + '/config/ros2/firefly_params.yaml'
-    robot_node = Node(package=package_name,
-                      executable='hex_ros_robot_firefly_y6',
-                      name='hex_ros_robot_firefly_y6',
-                      output="screen",
-                      emulate_tty=True,
-                      parameters=[
-                          robot_param_path,
-                          {
-                              'robot_host': LaunchConfiguration('robot_host'),
-                              'robot_port': LaunchConfiguration('robot_port'),
-                              'robot_grip_type':
-                              LaunchConfiguration('robot_grip_type'),
-                          },
-                      ])
+    robot_node = Node(
+        package=package_name,
+        executable='hex_ros_robot_firefly_y6',
+        name='hex_ros_robot_firefly_y6',
+        output="screen",
+        emulate_tty=True,
+        parameters=[
+            robot_param_path,
+            {
+                'robot_host': LaunchConfiguration('robot_host'),
+                'robot_port': LaunchConfiguration('robot_port'),
+                'robot_grip_type':
+                LaunchConfiguration('robot_grip_type'),
+            },
+        ],
+        remappings=[
+            ('manip_ctrl', 'manip_ctrl'),
+            ('manip_state', 'manip_state'),
+            ('joint_states', 'joint_states'),
+        ])
 
     # test group
     test_group = GroupAction(
@@ -81,6 +92,7 @@ def generate_launch_description():
         robot_host_arg,
         robot_port_arg,
         robot_grip_type_arg,
+        variant_arg,
         robot_node,
         test_group,
     ])

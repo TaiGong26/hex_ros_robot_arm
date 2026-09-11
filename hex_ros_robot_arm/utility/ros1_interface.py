@@ -62,6 +62,7 @@ class DataInterface(ArmInterfaceBase):
             "enable_kcp": rospy.get_param('~robot_enable_kcp', True),
             "state_buffer_size": rospy.get_param('~state_buffer_size', 200),
             "sens_ts": rospy.get_param('~sens_ts', True),
+            "variant": rospy.get_param('~variant', "H1"),
         }
 
         ### publisher — manip_state

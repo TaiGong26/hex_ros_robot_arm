@@ -20,3 +20,6 @@ state_buffer_size: 200
 
 # sensor timestamp enable
 sens_ts: true
+
+# robot variant: "H1" or "H2_40"
+variant: "H2_40"

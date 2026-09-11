@@ -71,6 +71,7 @@ class DataInterface(ArmInterfaceBase):
         self.__node.declare_parameter('robot_enable_kcp', True)
         self.__node.declare_parameter('state_buffer_size', 200)
         self.__node.declare_parameter('sens_ts', True)
+        self.__node.declare_parameter('variant', "H1")
         self._robot_param = {
             "host": self.__node.get_parameter('robot_host').value,
             "port": self.__node.get_parameter('robot_port').value,
@@ -79,6 +80,7 @@ class DataInterface(ArmInterfaceBase):
             "enable_kcp": self.__node.get_parameter('robot_enable_kcp').value,
             "state_buffer_size": self.__node.get_parameter('state_buffer_size').value,
             "sens_ts": self.__node.get_parameter('sens_ts').value,
+            "variant": self.__node.get_parameter('variant').value,
         }
 
         ### publisher — manip_state

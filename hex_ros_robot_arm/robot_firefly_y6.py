@@ -31,6 +31,11 @@ from hex_util_msg.dataclass.dataclass_base import (
     HexDcBaseJntState,
 )
 
+TYPE = {
+    "H1": 27,
+    "H2_40": 39,
+}
+
 
 class RobotFireflyY6:
 
@@ -60,6 +65,7 @@ class RobotFireflyY6:
             sens_ts=robot_param["sens_ts"],
             grip_type=robot_param["grip_type"],
             enable_kcp=robot_param["enable_kcp"],
+            robot_type=TYPE.get(robot_param["variant"], 27)
         ))
         self.__robot.start()
 
